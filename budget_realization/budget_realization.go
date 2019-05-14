@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"erp_reporting/connection"
 	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -98,9 +99,9 @@ const (
 			LEFT JOIN "public".budget_plan ON "public".budget_plan."id" = "public".budget_plan_line.budget_id
 			WHERE
 			EXTRACT(YEAR from "public".budget_plan.periode_start) IS NOT NULL AND
-			EXTRACT(YEAR from "public".budget_plan.periode_start) = %d AND
+			EXTRACT(YEAR from "public".budget_plan.periode_start) = %v AND
 			"public".budget_plan."state" NOT IN ('draft', 'cancel', 'approve1') AND
-			"public".budget_plan.department_id = %d
+			"public".budget_plan.department_id = %v
 			GROUP BY
 			AA.budget_plan_line_id,
 			AA.narration,
@@ -113,11 +114,12 @@ func GetBudgetRealization(w http.ResponseWriter, r *http.Request) {
 	var budgetRealizations BudgetRealization
 	var arrBudgetRealizations []BudgetRealization
 	var response BudgetRealizationResponse
+	var vars = mux.Vars(r)
 
 	db := connection.ConnectErp()
 	defer db.Close()
 
-	rows, err := db.Query(fmt.Sprintf(query, 2019, 4))
+	rows, err := db.Query(fmt.Sprintf(query, vars["tahun"], vars["dept_id"]))
 
 	if err != nil {
 		panic(err)

@@ -17,7 +17,7 @@ func main() {
 
 func runServer() {
 	router := mux.NewRouter()
-	router.HandleFunc("/budget_realization", budget_realization.GetBudgetRealization).Methods("GET")
+	router.HandleFunc("/budget_realization/{tahun}/{dept_id}", budget_realization.GetBudgetRealization).Methods("GET")
 	http.Handle("/", router)
 	fmt.Println("Connected to port 1234")
 	log.Fatal(http.ListenAndServe(":1234", router))
